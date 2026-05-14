@@ -117,14 +117,24 @@ function toggleCat(catEl) {
 }
 
 /* Viewer */
-const app          = document.getElementById('app');
-const viewer       = document.getElementById('viewer');
-const viewerTitle  = document.getElementById('viewerTitle');
-const viewerTag    = document.getElementById('viewerTag');
-const pdfCanvas    = document.getElementById('pdfCanvas');
-const loader       = document.getElementById('pdfLoader');
-const viewerOpen   = document.getElementById('viewerOpen');
-const viewerDl     = document.getElementById('viewerDownload');
+const app           = document.getElementById('app');
+const viewer        = document.getElementById('viewer');
+const viewerTitle   = document.getElementById('viewerTitle');
+const viewerTag     = document.getElementById('viewerTag');
+const pdfCanvas     = document.getElementById('pdfCanvas');
+const loader        = document.getElementById('pdfLoader');
+const viewerOpen    = document.getElementById('viewerOpen');
+const viewerDl      = document.getElementById('viewerDownload');
+const pageIndicator = document.getElementById('pageIndicator');
+const pageNumEl     = document.getElementById('pageNum');
+const pageTotalEl   = document.getElementById('pageTotal');
+
+/* Mode helpers */
+const isMobile    = () => window.matchMedia('(max-width: 1023px)').matches;
+const isLandscape = () => window.matchMedia('(orientation: landscape)').matches;
+let manualFullscreen = false;
+let slideMode = false;
+let totalPages = 0;
 
 /* PDF.js setup */
 let pdfReady = false;
@@ -150,7 +160,6 @@ async function renderPdf(url) {
     loader.classList.remove('fading');
 
     if (!setupPdfJs()) {
-        // pdf.js not yet loaded; wait briefly
         await new Promise(r => setTimeout(r, 200));
         setupPdfJs();
     }
@@ -158,15 +167,28 @@ async function renderPdf(url) {
     try {
         const pdf = await window.pdfjsLib.getDocument(url).promise;
         if (token !== renderToken) return;
+        totalPages = pdf.numPages;
+        pageTotalEl.textContent = totalPages;
+        pageNumEl.textContent = 1;
 
-        const containerWidth = Math.max(pdfCanvas.clientWidth - 32, 280);
+        const slide = slideMode;
+        const containerWidth = Math.max(pdfCanvas.clientWidth - (slide ? 20 : 32), 280);
+        const containerHeight = pdfCanvas.clientHeight - (slide ? 20 : 0);
         const dpr = window.devicePixelRatio || 1;
 
         for (let i = 1; i <= pdf.numPages; i++) {
             if (token !== renderToken) return;
             const page = await pdf.getPage(i);
             const baseViewport = page.getViewport({ scale: 1 });
-            const scale = containerWidth / baseViewport.width;
+
+            let scale;
+            if (slide) {
+                const ws = containerWidth / baseViewport.width;
+                const hs = containerHeight / baseViewport.height;
+                scale = Math.min(ws, hs);
+            } else {
+                scale = containerWidth / baseViewport.width;
+            }
             const viewport = page.getViewport({ scale });
 
             const canvas = document.createElement('canvas');
@@ -174,7 +196,15 @@ async function renderPdf(url) {
             canvas.height = Math.floor(viewport.height * dpr);
             canvas.style.width = Math.floor(viewport.width) + 'px';
             canvas.style.height = Math.floor(viewport.height) + 'px';
-            pdfCanvas.appendChild(canvas);
+
+            if (slide) {
+                const wrap = document.createElement('div');
+                wrap.className = 'pdf-page';
+                wrap.appendChild(canvas);
+                pdfCanvas.appendChild(wrap);
+            } else {
+                pdfCanvas.appendChild(canvas);
+            }
 
             const renderContext = {
                 canvasContext: canvas.getContext('2d'),
@@ -184,7 +214,6 @@ async function renderPdf(url) {
             await page.render(renderContext).promise;
             if (token !== renderToken) return;
 
-            // Show after first page loads
             if (i === 1) {
                 pdfCanvas.classList.add('loaded');
                 loader.classList.add('fading');
@@ -202,6 +231,56 @@ async function renderPdf(url) {
     }
 }
 
+/* Slide mode + fullscreen */
+function applyModes() {
+    const wantSlide = manualFullscreen || (isMobile() && isLandscape() && viewer.classList.contains('is-active'));
+    if (wantSlide !== slideMode) {
+        slideMode = wantSlide;
+        pdfCanvas.classList.toggle('slide-mode', slideMode);
+        pageIndicator.hidden = !slideMode;
+        if (currentResizeUrl) renderPdf(currentResizeUrl);
+    }
+    viewer.classList.toggle('is-fullscreen', manualFullscreen);
+}
+
+function toggleFullscreen() {
+    manualFullscreen = !manualFullscreen;
+    applyModes();
+    if (manualFullscreen) {
+        const el = document.documentElement;
+        const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
+        if (req) req.call(el).catch(() => {});
+    } else {
+        const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
+        if (exit && (document.fullscreenElement || document.webkitFullscreenElement)) {
+            exit.call(document).catch(() => {});
+        }
+    }
+}
+
+/* Listen to orientation/viewport changes */
+window.matchMedia('(orientation: landscape)').addEventListener('change', applyModes);
+window.matchMedia('(max-width: 1023px)').addEventListener('change', applyModes);
+document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement && manualFullscreen) {
+        manualFullscreen = false;
+        applyModes();
+    }
+});
+
+/* Page indicator updates on scroll */
+let scrollDebounce;
+pdfCanvas.addEventListener('scroll', () => {
+    if (!slideMode) return;
+    clearTimeout(scrollDebounce);
+    scrollDebounce = setTimeout(() => {
+        const pageW = pdfCanvas.clientWidth;
+        if (!pageW) return;
+        const n = Math.min(Math.max(Math.round(pdfCanvas.scrollLeft / pageW) + 1, 1), totalPages);
+        pageNumEl.textContent = n;
+    }, 60);
+});
+
 function openPdf(href, name, tag, triggerBtn) {
     viewerTitle.textContent = name;
     viewerTitle.title = name;
@@ -211,6 +290,13 @@ function openPdf(href, name, tag, triggerBtn) {
     viewerDl.setAttribute('download', name);
 
     viewer.classList.add('is-active');
+
+    // Set mode based on current device state before rendering
+    slideMode = manualFullscreen || (isMobile() && isLandscape());
+    pdfCanvas.classList.toggle('slide-mode', slideMode);
+    pageIndicator.hidden = !slideMode;
+    viewer.classList.toggle('is-fullscreen', manualFullscreen);
+
     renderPdf(href);
 
     document.querySelectorAll('.pdf.is-active').forEach(el => el.classList.remove('is-active'));
@@ -228,6 +314,16 @@ function closePdf() {
     viewerTitle.textContent = 'Selecione um manual';
     viewerTag.textContent = '—';
     document.querySelectorAll('.pdf.is-active').forEach(el => el.classList.remove('is-active'));
+    // Exit fullscreen on close
+    if (manualFullscreen) {
+        manualFullscreen = false;
+        const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen;
+        if (exit && (document.fullscreenElement || document.webkitFullscreenElement)) {
+            exit.call(document).catch(() => {});
+        }
+    }
+    applyModes();
+    pageIndicator.hidden = true;
 }
 
 /* Re-render on significant resize / sidebar toggle */
@@ -256,6 +352,7 @@ document.addEventListener('click', (e) => {
     if (e.target.closest('[data-close-viewer]')) return closePdf();
     if (e.target.closest('[data-toggle-sidebar]')) return toggleSidebar(true);
     if (e.target.closest('[data-show-sidebar]')) return toggleSidebar(false);
+    if (e.target.closest('[data-toggle-fullscreen]')) return toggleFullscreen();
 
     const pdfBtn = e.target.closest('.pdf');
     if (pdfBtn) {
