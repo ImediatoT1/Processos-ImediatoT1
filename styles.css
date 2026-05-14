@@ -1,0 +1,595 @@
+/* Processos T1 — Linktree sidebar + viewer */
+
+:root {
+    --bg: #07090F;
+    --bg-deep: #04060B;
+    --surface: rgba(255,255,255,0.04);
+    --surface-hover: rgba(255,255,255,0.07);
+    --surface-active: rgba(255,255,255,0.10);
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.14);
+    --text: #F1F5F9;
+    --text-muted: #94A3B8;
+    --text-dim: #64748B;
+
+    --radius: 12px;
+    --radius-lg: 18px;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    --sidebar-w: 400px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+button { font-family: inherit; cursor: pointer; border: 0; background: none; color: inherit; }
+input { font-family: inherit; }
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+
+/* ============================================
+   APP LAYOUT
+   ============================================ */
+.app {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar {
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    background: var(--bg-deep);
+    border-right: 1px solid var(--border);
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+    transition: transform 0.45s var(--ease), width 0.45s var(--ease);
+    position: relative;
+    z-index: 2;
+}
+.sidebar::-webkit-scrollbar { width: 8px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.06);
+    border-radius: 4px;
+}
+.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.12); }
+
+.sidebar-inner {
+    padding: 40px 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-height: 100%;
+}
+
+.app.sidebar-collapsed .sidebar {
+    transform: translateX(-100%);
+    width: 0;
+    border-right-color: transparent;
+}
+
+/* Sidebar header */
+.tree-head {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+    padding-bottom: 4px;
+}
+.logo {
+    height: 52px;
+    width: auto;
+    object-fit: contain;
+}
+.brand-name {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    margin: 0;
+    letter-spacing: -0.005em;
+    color: var(--text);
+    font-feature-settings: "tnum" 1, "lnum" 1;
+}
+.brand-bio {
+    color: var(--text-muted);
+    font-size: 12.5px;
+    margin: 0;
+    letter-spacing: 0.02em;
+}
+
+/* Search */
+.search { position: relative; }
+.search svg {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    width: 15px; height: 15px;
+    color: var(--text-dim);
+    pointer-events: none;
+}
+.search input {
+    width: 100%;
+    padding: 11px 14px 11px 38px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 13.5px;
+    outline: none;
+    transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
+}
+.search input::placeholder { color: var(--text-dim); }
+.search input:focus {
+    border-color: var(--border-strong);
+    background: var(--surface-hover);
+}
+
+/* Links / categories */
+.links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.cat {
+    display: block;
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
+}
+.cat:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-strong);
+}
+.cat.open {
+    background: var(--surface-hover);
+    border-color: var(--border-strong);
+}
+.cat-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    text-align: left;
+}
+.cat-icon {
+    flex-shrink: 0;
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    display: grid; place-items: center;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    transition: color 0.25s var(--ease);
+}
+.cat:hover .cat-icon,
+.cat.open .cat-icon { color: var(--text); }
+.cat-icon svg { width: 18px; height: 18px; }
+.cat-text { flex: 1; min-width: 0; }
+.cat-title {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.25;
+}
+.cat-count {
+    display: block;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin-top: 1px;
+}
+.cat-chev {
+    color: var(--text-dim);
+    transition: transform 0.35s var(--ease), color 0.25s var(--ease);
+    flex-shrink: 0;
+}
+.cat-chev svg { width: 16px; height: 16px; display: block; }
+.cat.open .cat-chev { transform: rotate(90deg); color: var(--text-muted); }
+
+.cat-list {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s var(--ease);
+    padding: 0 6px;
+}
+.cat.open .cat-list { max-height: 1400px; }
+.cat-list-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: 6px;
+    padding-bottom: 10px;
+    margin-top: 4px;
+    border-top: 1px solid var(--border);
+}
+
+.pdf {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 10px;
+    border-radius: 8px;
+    text-align: left;
+    color: var(--text);
+    transition: background 0.2s var(--ease);
+    opacity: 0;
+    transform: translateY(-4px);
+    position: relative;
+}
+.cat.open .pdf {
+    animation: pdfIn 0.4s var(--ease) both;
+}
+@keyframes pdfIn {
+    to { opacity: 1; transform: translateY(0); }
+}
+.pdf:hover { background: rgba(255,255,255,0.05); }
+.pdf.is-active {
+    background: var(--surface-active);
+}
+.pdf.is-active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 8px; bottom: 8px;
+    width: 2px;
+    background: var(--text);
+    border-radius: 2px;
+}
+.pdf-bullet {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    flex-shrink: 0;
+    transition: background 0.2s var(--ease);
+}
+.pdf.is-active .pdf-bullet,
+.pdf:hover .pdf-bullet { background: var(--text-muted); }
+.pdf-name {
+    flex: 1;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.35;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+}
+.pdf-arrow {
+    color: var(--text-dim);
+    opacity: 0;
+    transition: opacity 0.2s var(--ease), transform 0.25s var(--ease);
+    flex-shrink: 0;
+}
+.pdf-arrow svg { width: 13px; height: 13px; display: block; }
+.pdf:hover .pdf-arrow { opacity: 1; transform: translateX(2px); color: var(--text); }
+.pdf.is-active .pdf-arrow { opacity: 1; color: var(--text); }
+
+.coming-soon-msg {
+    padding: 12px;
+    color: var(--text-muted);
+    font-size: 12.5px;
+    text-align: center;
+}
+
+.empty {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    padding: 14px 0;
+}
+
+.tree-foot {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 11.5px;
+    margin-top: auto;
+    padding-top: 16px;
+}
+
+.filter-hidden { display: none !important; }
+
+/* ============================================
+   VIEWER (main area)
+   ============================================ */
+.viewer {
+    flex: 1;
+    min-width: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    position: relative;
+    overflow: hidden;
+}
+.viewer-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+    flex-shrink: 0;
+}
+.viewer-meta {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.viewer-tag {
+    align-self: flex-start;
+    padding: 2px 9px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: opacity 0.3s var(--ease);
+}
+.viewer-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 15.5px;
+    margin: 0;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: opacity 0.3s var(--ease);
+}
+.viewer-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+.vbtn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    border-radius: 8px;
+    transition: background 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+.vbtn:hover {
+    background: var(--surface-hover);
+    border-color: var(--border-strong);
+    color: var(--text);
+}
+.vbtn-square {
+    width: 34px; height: 34px;
+    display: grid; place-items: center;
+}
+.vbtn svg { width: 15px; height: 15px; display: block; }
+.close-viewer:hover {
+    background: rgba(244,63,94,0.12);
+    border-color: rgba(244,63,94,0.3);
+    color: #FCA5A5;
+}
+
+/* When no PDF is open, hide title/tag/actions — keep only the sidebar toggle */
+.viewer:not(.is-active) .viewer-meta,
+.viewer:not(.is-active) .viewer-actions { display: none; }
+.viewer:not(.is-active) .viewer-bar {
+    border-bottom-color: transparent;
+    background: transparent;
+}
+
+.viewer-body {
+    flex: 1;
+    position: relative;
+    background: #1A1A1A;
+    overflow: hidden;
+}
+.viewer-empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 40px;
+    color: var(--text-muted);
+    text-align: center;
+    background: var(--bg);
+    transition: opacity 0.4s var(--ease);
+}
+.viewer-empty-icon {
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: grid; place-items: center;
+    color: var(--text-dim);
+}
+.viewer-empty-icon svg { width: 28px; height: 28px; }
+.viewer-empty h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: 17px;
+    margin: 0;
+    color: var(--text);
+}
+.viewer-empty p {
+    margin: 0;
+    font-size: 13.5px;
+    max-width: 320px;
+    color: var(--text-muted);
+}
+.viewer.is-active .viewer-empty {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#pdfFrame {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #1A1A1A;
+    opacity: 0;
+    transform: translateX(-24px) scale(0.985);
+    transition:
+        opacity 0.45s var(--ease),
+        transform 0.55s var(--ease);
+}
+.viewer.is-active #pdfFrame.loaded {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+}
+
+.pdf-loader {
+    position: absolute;
+    inset: 0;
+    display: grid; place-items: center;
+    pointer-events: none;
+    background: #1A1A1A;
+    transition: opacity 0.3s var(--ease);
+}
+.pdf-loader[hidden] { display: none; }
+.pdf-loader.fading { opacity: 0; }
+.spinner {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.08);
+    border-top-color: rgba(255,255,255,0.55);
+    animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Floating toggle (shown when sidebar collapsed) */
+.floating-toggle {
+    position: fixed;
+    left: 16px; top: 16px;
+    z-index: 10;
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    display: grid; place-items: center;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateX(-12px);
+    transition: opacity 0.3s var(--ease), transform 0.3s var(--ease), background 0.2s var(--ease);
+    pointer-events: none;
+}
+.app.sidebar-collapsed .floating-toggle {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+.floating-toggle:hover { background: var(--surface-hover); }
+.floating-toggle svg { width: 18px; height: 18px; }
+
+/* ============================================
+   MOBILE LAYOUT (<= 1023px)
+   - Sidebar centered, viewer becomes overlay
+   ============================================ */
+@media (max-width: 1023px) {
+    html, body { overflow: auto; }
+    .app {
+        display: block;
+        height: auto;
+        min-height: 100vh;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: 0;
+        background: transparent;
+        overflow: visible;
+        scrollbar-gutter: auto;
+        transform: none !important;
+        transition: none;
+    }
+    .app.sidebar-collapsed .sidebar { transform: none; width: 100%; }
+    .sidebar-inner {
+        max-width: 520px;
+        margin: 0 auto;
+        padding: 40px 18px 32px;
+    }
+    .logo { height: 56px; }
+    .brand-name { font-size: 22px; }
+
+    /* Viewer becomes a fullscreen overlay sliding up */
+    .viewer {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        height: 100dvh;
+        background: var(--bg);
+        transform: translateY(100%);
+        opacity: 0;
+        transition: transform 0.4s var(--ease), opacity 0.3s var(--ease);
+        pointer-events: none;
+    }
+    .viewer.is-active {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .viewer-bar { padding: 12px 14px; }
+    .viewer-title { font-size: 14px; max-width: 50vw; }
+    /* Hide sidebar toggle on mobile; close button is the way out */
+    .viewer-bar [data-toggle-sidebar] { display: none; }
+    .floating-toggle { display: none !important; }
+
+    #pdfFrame {
+        transform: translateY(20px) scale(0.98);
+    }
+    .viewer.is-active #pdfFrame.loaded {
+        transform: translateY(0) scale(1);
+    }
+    .viewer-empty { display: none; }
+}
+
+@media (max-width: 480px) {
+    .sidebar-inner { padding: 32px 14px 28px; gap: 20px; }
+    .logo { height: 48px; }
+    .brand-name { font-size: 20px; }
+    .viewer-title { max-width: 42vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+:focus-visible {
+    outline: 2px solid rgba(255,255,255,0.3);
+    outline-offset: 3px;
+    border-radius: 6px;
+}
