@@ -416,6 +416,7 @@ img { display: block; max-width: 100%; }
     gap: 0;
     height: 100%;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
 }
 .pdf-canvas.slide-mode .pdf-page {
     flex: 0 0 100%;
@@ -427,6 +428,13 @@ img { display: block; max-width: 100%; }
     scroll-snap-align: center;
     scroll-snap-stop: always;
     padding: 10px;
+    overflow: hidden;
+    touch-action: pan-x;
+    position: relative;
+}
+.pdf-canvas.slide-mode .pdf-page.zoomed {
+    touch-action: none;
+    scroll-snap-align: none;
 }
 .pdf-canvas.slide-mode canvas {
     max-width: 100%;
@@ -434,6 +442,11 @@ img { display: block; max-width: 100%; }
     width: auto !important;
     height: auto !important;
     object-fit: contain;
+    transform-origin: center center;
+    will-change: transform;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
 }
 .pdf-canvas.slide-mode::-webkit-scrollbar { display: none; }
 

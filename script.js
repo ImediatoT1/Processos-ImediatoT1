@@ -191,9 +191,12 @@ async function renderPdf(url) {
             }
             const viewport = page.getViewport({ scale });
 
+            // Render at higher resolution in slide mode for crisp zoom
+            const renderDpr = slide ? Math.max(dpr, 2.5) : dpr;
+
             const canvas = document.createElement('canvas');
-            canvas.width = Math.floor(viewport.width * dpr);
-            canvas.height = Math.floor(viewport.height * dpr);
+            canvas.width = Math.floor(viewport.width * renderDpr);
+            canvas.height = Math.floor(viewport.height * renderDpr);
             canvas.style.width = Math.floor(viewport.width) + 'px';
             canvas.style.height = Math.floor(viewport.height) + 'px';
 
@@ -202,6 +205,7 @@ async function renderPdf(url) {
                 wrap.className = 'pdf-page';
                 wrap.appendChild(canvas);
                 pdfCanvas.appendChild(wrap);
+                attachPinchZoom(wrap, canvas);
             } else {
                 pdfCanvas.appendChild(canvas);
             }
@@ -209,7 +213,7 @@ async function renderPdf(url) {
             const renderContext = {
                 canvasContext: canvas.getContext('2d'),
                 viewport,
-                transform: dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null,
+                transform: renderDpr !== 1 ? [renderDpr, 0, 0, renderDpr, 0, 0] : null,
             };
             await page.render(renderContext).promise;
             if (token !== renderToken) return;
@@ -229,6 +233,90 @@ async function renderPdf(url) {
             setTimeout(() => { loader.hidden = true; }, 300);
         }
     }
+}
+
+/* Pinch zoom + pan + double-tap zoom on each slide page */
+function attachPinchZoom(pageEl, canvasEl) {
+    let scale = 1, tx = 0, ty = 0;
+    const pointers = new Map();
+    let pinchStartDist = 0;
+    let pinchStartScale = 1;
+    let panStartX = 0, panStartY = 0;
+    let lastTap = 0;
+
+    function apply(animate) {
+        canvasEl.style.transition = animate ? 'transform 0.22s ease' : '';
+        canvasEl.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+        pageEl.classList.toggle('zoomed', scale > 1.02);
+    }
+    function reset(animate = true) {
+        scale = 1; tx = 0; ty = 0;
+        apply(animate);
+    }
+    function clampPan() {
+        const maxX = (canvasEl.clientWidth * (scale - 1)) / 2;
+        const maxY = (canvasEl.clientHeight * (scale - 1)) / 2;
+        tx = Math.min(Math.max(tx, -maxX), maxX);
+        ty = Math.min(Math.max(ty, -maxY), maxY);
+    }
+
+    pageEl.addEventListener('pointerdown', (e) => {
+        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+        if (pointers.size === 2) {
+            const [a, b] = [...pointers.values()];
+            pinchStartDist = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+            pinchStartScale = scale;
+            // Take over both pointers — prevent native scroll/zoom
+            try { pageEl.setPointerCapture(e.pointerId); } catch (_) {}
+            e.preventDefault();
+        } else if (pointers.size === 1 && scale > 1.02) {
+            panStartX = e.clientX - tx;
+            panStartY = e.clientY - ty;
+            try { pageEl.setPointerCapture(e.pointerId); } catch (_) {}
+        }
+    }, { passive: false });
+
+    pageEl.addEventListener('pointermove', (e) => {
+        if (!pointers.has(e.pointerId)) return;
+        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+        if (pointers.size === 2) {
+            const [a, b] = [...pointers.values()];
+            const dist = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+            scale = Math.min(Math.max(pinchStartScale * (dist / pinchStartDist), 1), 5);
+            if (scale <= 1) { tx = 0; ty = 0; }
+            else clampPan();
+            apply(false);
+            e.preventDefault();
+        } else if (pointers.size === 1 && scale > 1.02) {
+            tx = e.clientX - panStartX;
+            ty = e.clientY - panStartY;
+            clampPan();
+            apply(false);
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    function onEnd(e) {
+        const wasOne = pointers.size === 1;
+        pointers.delete(e.pointerId);
+        if (scale <= 1.05) reset(true);
+
+        // Double-tap (single finger up, no movement)
+        if (wasOne && pointers.size === 0) {
+            const now = Date.now();
+            if (now - lastTap < 280) {
+                if (scale > 1.02) reset(true);
+                else { scale = 2.2; tx = 0; ty = 0; apply(true); }
+                lastTap = 0;
+            } else {
+                lastTap = now;
+            }
+        }
+    }
+    pageEl.addEventListener('pointerup', onEnd);
+    pageEl.addEventListener('pointercancel', onEnd);
 }
 
 /* Slide mode + fullscreen */
