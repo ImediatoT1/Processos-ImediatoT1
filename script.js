@@ -176,6 +176,11 @@ async function renderPdf(url) {
         const containerHeight = pdfCanvas.clientHeight - (slide ? 20 : 0);
         const dpr = window.devicePixelRatio || 1;
 
+        // Quality multiplier — render at much higher resolution than display
+        // so PDFs stay crisp at any zoom (and on hi-DPI screens)
+        const QUALITY = slide ? 4 : 3;
+        const renderScale = Math.max(QUALITY, dpr * 1.5);
+
         for (let i = 1; i <= pdf.numPages; i++) {
             if (token !== renderToken) return;
             const page = await pdf.getPage(i);
@@ -191,12 +196,9 @@ async function renderPdf(url) {
             }
             const viewport = page.getViewport({ scale });
 
-            // Render at higher resolution in slide mode for crisp zoom
-            const renderDpr = slide ? Math.max(dpr, 2.5) : dpr;
-
             const canvas = document.createElement('canvas');
-            canvas.width = Math.floor(viewport.width * renderDpr);
-            canvas.height = Math.floor(viewport.height * renderDpr);
+            canvas.width = Math.floor(viewport.width * renderScale);
+            canvas.height = Math.floor(viewport.height * renderScale);
             canvas.style.width = Math.floor(viewport.width) + 'px';
             canvas.style.height = Math.floor(viewport.height) + 'px';
 
@@ -209,10 +211,15 @@ async function renderPdf(url) {
                 pdfCanvas.appendChild(canvas);
             }
 
+            const ctx = canvas.getContext('2d');
+            // High-quality image smoothing for any browser-side downsampling
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+
             const renderContext = {
-                canvasContext: canvas.getContext('2d'),
+                canvasContext: ctx,
                 viewport,
-                transform: renderDpr !== 1 ? [renderDpr, 0, 0, renderDpr, 0, 0] : null,
+                transform: [renderScale, 0, 0, renderScale, 0, 0],
             };
             await page.render(renderContext).promise;
             if (token !== renderToken) return;
