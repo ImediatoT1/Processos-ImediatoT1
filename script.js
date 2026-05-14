@@ -205,7 +205,6 @@ async function renderPdf(url) {
                 wrap.className = 'pdf-page';
                 wrap.appendChild(canvas);
                 pdfCanvas.appendChild(wrap);
-                attachPinchZoom(wrap, canvas);
             } else {
                 pdfCanvas.appendChild(canvas);
             }
@@ -235,88 +234,167 @@ async function renderPdf(url) {
     }
 }
 
-/* Pinch zoom + pan + double-tap zoom on each slide page */
-function attachPinchZoom(pageEl, canvasEl) {
-    let scale = 1, tx = 0, ty = 0;
-    const pointers = new Map();
-    let pinchStartDist = 0;
-    let pinchStartScale = 1;
+/* Centralized touch gestures for slide mode:
+   - 1 finger (scale=1): swipe between pages
+   - 2 fingers: pinch zoom on current page
+   - 1 finger (scale>1): pan within current page
+   - Double tap: toggle zoom 1x <-> 2.2x */
+function attachSlideGestures(container) {
+    const pageState = new WeakMap();
+
+    function getState(pageEl) {
+        let s = pageState.get(pageEl);
+        if (!s) { s = { scale: 1, tx: 0, ty: 0 }; pageState.set(pageEl, s); }
+        return s;
+    }
+    function applyZoom(pageEl, animate) {
+        const canvas = pageEl.querySelector('canvas');
+        if (!canvas) return;
+        const s = getState(pageEl);
+        canvas.style.transition = animate ? 'transform 0.22s ease' : '';
+        canvas.style.transform = `translate3d(${s.tx}px, ${s.ty}px, 0) scale(${s.scale})`;
+        pageEl.classList.toggle('zoomed', s.scale > 1.02);
+    }
+    function clampPan(pageEl) {
+        const canvas = pageEl.querySelector('canvas');
+        if (!canvas) return;
+        const s = getState(pageEl);
+        const maxX = (canvas.clientWidth * (s.scale - 1)) / 2;
+        const maxY = (canvas.clientHeight * (s.scale - 1)) / 2;
+        s.tx = Math.min(Math.max(s.tx, -maxX), maxX);
+        s.ty = Math.min(Math.max(s.ty, -maxY), maxY);
+    }
+    function currentPageIdx() {
+        const pw = container.clientWidth;
+        return pw ? Math.round(container.scrollLeft / pw) : 0;
+    }
+    function getActivePage() {
+        return container.children[currentPageIdx()] || null;
+    }
+    function snapToIdx(idx, animate = true) {
+        const pw = container.clientWidth;
+        const max = container.children.length - 1;
+        idx = Math.min(Math.max(idx, 0), max);
+        if (animate) container.scrollTo({ left: idx * pw, behavior: 'smooth' });
+        else container.scrollLeft = idx * pw;
+    }
+
+    let mode = null;            // 'swipe' | 'pinch' | 'pan'
+    let activePage = null;
+    let swipeStartX = 0, swipeStartScroll = 0, swipeMaxDelta = 0;
+    let pinchStartDist = 0, pinchStartScale = 1;
     let panStartX = 0, panStartY = 0;
     let lastTap = 0;
+    let tapStartX = 0, tapStartY = 0;
 
-    function apply(animate) {
-        canvasEl.style.transition = animate ? 'transform 0.22s ease' : '';
-        canvasEl.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
-        pageEl.classList.toggle('zoomed', scale > 1.02);
-    }
-    function reset(animate = true) {
-        scale = 1; tx = 0; ty = 0;
-        apply(animate);
-    }
-    function clampPan() {
-        const maxX = (canvasEl.clientWidth * (scale - 1)) / 2;
-        const maxY = (canvasEl.clientHeight * (scale - 1)) / 2;
-        tx = Math.min(Math.max(tx, -maxX), maxX);
-        ty = Math.min(Math.max(ty, -maxY), maxY);
-    }
-
-    pageEl.addEventListener('pointerdown', (e) => {
-        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-
-        if (pointers.size === 2) {
-            const [a, b] = [...pointers.values()];
-            pinchStartDist = Math.hypot(b.x - a.x, b.y - a.y) || 1;
-            pinchStartScale = scale;
-            // Take over both pointers — prevent native scroll/zoom
-            try { pageEl.setPointerCapture(e.pointerId); } catch (_) {}
-            e.preventDefault();
-        } else if (pointers.size === 1 && scale > 1.02) {
-            panStartX = e.clientX - tx;
-            panStartY = e.clientY - ty;
-            try { pageEl.setPointerCapture(e.pointerId); } catch (_) {}
-        }
-    }, { passive: false });
-
-    pageEl.addEventListener('pointermove', (e) => {
-        if (!pointers.has(e.pointerId)) return;
-        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-
-        if (pointers.size === 2) {
-            const [a, b] = [...pointers.values()];
-            const dist = Math.hypot(b.x - a.x, b.y - a.y) || 1;
-            scale = Math.min(Math.max(pinchStartScale * (dist / pinchStartDist), 1), 5);
-            if (scale <= 1) { tx = 0; ty = 0; }
-            else clampPan();
-            apply(false);
-            e.preventDefault();
-        } else if (pointers.size === 1 && scale > 1.02) {
-            tx = e.clientX - panStartX;
-            ty = e.clientY - panStartY;
-            clampPan();
-            apply(false);
-            e.preventDefault();
-        }
-    }, { passive: false });
-
-    function onEnd(e) {
-        const wasOne = pointers.size === 1;
-        pointers.delete(e.pointerId);
-        if (scale <= 1.05) reset(true);
-
-        // Double-tap (single finger up, no movement)
-        if (wasOne && pointers.size === 0) {
-            const now = Date.now();
-            if (now - lastTap < 280) {
-                if (scale > 1.02) reset(true);
-                else { scale = 2.2; tx = 0; ty = 0; apply(true); }
-                lastTap = 0;
+    container.addEventListener('touchstart', (e) => {
+        if (!container.classList.contains('slide-mode')) return;
+        if (e.touches.length === 1) {
+            activePage = getActivePage();
+            if (!activePage) return;
+            const s = getState(activePage);
+            const t = e.touches[0];
+            tapStartX = t.clientX; tapStartY = t.clientY;
+            if (s.scale > 1.02) {
+                mode = 'pan';
+                panStartX = t.clientX - s.tx;
+                panStartY = t.clientY - s.ty;
             } else {
-                lastTap = now;
+                mode = 'swipe';
+                swipeStartX = t.clientX;
+                swipeStartScroll = container.scrollLeft;
+                swipeMaxDelta = 0;
+            }
+        } else if (e.touches.length === 2) {
+            // Lock onto current page before pinch
+            const idx = currentPageIdx();
+            container.scrollLeft = idx * container.clientWidth;
+            activePage = container.children[idx];
+            if (!activePage) return;
+            const [a, b] = e.touches;
+            pinchStartDist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY) || 1;
+            pinchStartScale = getState(activePage).scale;
+            mode = 'pinch';
+        }
+        e.preventDefault();
+    }, { passive: false });
+
+    container.addEventListener('touchmove', (e) => {
+        if (!mode || !activePage) return;
+        if (mode === 'pinch' && e.touches.length >= 2) {
+            const [a, b] = e.touches;
+            const dist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY) || 1;
+            const s = getState(activePage);
+            s.scale = Math.min(Math.max(pinchStartScale * (dist / pinchStartDist), 1), 5);
+            if (s.scale <= 1) { s.tx = 0; s.ty = 0; }
+            else clampPan(activePage);
+            applyZoom(activePage, false);
+        } else if (mode === 'pan' && e.touches.length === 1) {
+            const s = getState(activePage);
+            if (s.scale > 1.02) {
+                s.tx = e.touches[0].clientX - panStartX;
+                s.ty = e.touches[0].clientY - panStartY;
+                clampPan(activePage);
+                applyZoom(activePage, false);
+            }
+        } else if (mode === 'swipe' && e.touches.length === 1) {
+            const dx = e.touches[0].clientX - swipeStartX;
+            swipeMaxDelta = Math.max(swipeMaxDelta, Math.abs(dx));
+            container.scrollLeft = swipeStartScroll - dx;
+        }
+        e.preventDefault();
+    }, { passive: false });
+
+    container.addEventListener('touchend', (e) => {
+        if (e.touches.length === 0) {
+            const endedMode = mode;
+            const ap = activePage;
+
+            if (endedMode === 'swipe' && ap) {
+                const pw = container.clientWidth;
+                const dx = container.scrollLeft - swipeStartScroll;
+                const startIdx = Math.round(swipeStartScroll / pw);
+                let targetIdx = startIdx;
+                if (Math.abs(dx) > pw * 0.18) targetIdx = startIdx + (dx > 0 ? 1 : -1);
+                snapToIdx(targetIdx, true);
+
+                // Double-tap (no real swipe)
+                if (swipeMaxDelta < 8) {
+                    const now = Date.now();
+                    if (now - lastTap < 280) {
+                        const s = getState(ap);
+                        if (s.scale > 1.02) { s.scale = 1; s.tx = 0; s.ty = 0; }
+                        else { s.scale = 2.2; s.tx = 0; s.ty = 0; }
+                        applyZoom(ap, true);
+                        lastTap = 0;
+                    } else {
+                        lastTap = now;
+                    }
+                }
+            } else if (endedMode === 'pinch' && ap) {
+                const s = getState(ap);
+                if (s.scale <= 1.05) {
+                    s.scale = 1; s.tx = 0; s.ty = 0;
+                    applyZoom(ap, true);
+                }
+            }
+
+            mode = null;
+            activePage = null;
+        } else if (e.touches.length === 1 && mode === 'pinch') {
+            // 1 finger left after pinch: keep mode but stay on same page
+            mode = activePage && getState(activePage).scale > 1.02 ? 'pan' : null;
+            if (mode === 'pan') {
+                panStartX = e.touches[0].clientX - getState(activePage).tx;
+                panStartY = e.touches[0].clientY - getState(activePage).ty;
             }
         }
-    }
-    pageEl.addEventListener('pointerup', onEnd);
-    pageEl.addEventListener('pointercancel', onEnd);
+    }, { passive: false });
+
+    container.addEventListener('touchcancel', () => {
+        mode = null;
+        activePage = null;
+    });
 }
 
 /* Slide mode + fullscreen */
@@ -498,4 +576,5 @@ searchInput.addEventListener('input', () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     render();
+    attachSlideGestures(pdfCanvas);
 });

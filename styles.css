@@ -410,13 +410,13 @@ img { display: block; max-width: 100%; }
     flex-direction: row;
     overflow-x: auto;
     overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
     padding: 0;
     gap: 0;
     height: 100%;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-x;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    scrollbar-width: none;
 }
 .pdf-canvas.slide-mode .pdf-page {
     flex: 0 0 100%;
@@ -425,16 +425,10 @@ img { display: block; max-width: 100%; }
     display: flex;
     align-items: center;
     justify-content: center;
-    scroll-snap-align: center;
-    scroll-snap-stop: always;
     padding: 10px;
     overflow: hidden;
-    touch-action: pan-x;
-    position: relative;
-}
-.pdf-canvas.slide-mode .pdf-page.zoomed {
     touch-action: none;
-    scroll-snap-align: none;
+    position: relative;
 }
 .pdf-canvas.slide-mode canvas {
     max-width: 100%;
