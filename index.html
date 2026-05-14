@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <meta name="theme-color" content="#04060B" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <title>Processos T1</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,10 +25,13 @@
                 </header>
 
                 <div class="search">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <svg class="search-glass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
                     </svg>
                     <input id="searchInput" type="search" placeholder="Buscar manual…" aria-label="Buscar manual" autocomplete="off" />
+                    <button class="search-clear" id="searchClear" aria-label="Limpar busca" hidden>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
                 </div>
 
                 <nav class="links" id="links" aria-label="Categorias"></nav>
@@ -48,6 +54,17 @@
                     <h2 class="viewer-title" id="viewerTitle">Selecione um manual</h2>
                 </div>
                 <div class="viewer-actions">
+                    <div class="zoom-group" id="zoomGroup">
+                        <button class="vbtn vbtn-square zoom-btn" data-zoom="-" title="Diminuir zoom" aria-label="Diminuir zoom">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </button>
+                        <button class="vbtn zoom-level" data-zoom="reset" title="Resetar zoom" aria-label="Resetar zoom">
+                            <span id="zoomLevel">100%</span>
+                        </button>
+                        <button class="vbtn vbtn-square zoom-btn" data-zoom="+" title="Aumentar zoom" aria-label="Aumentar zoom">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </button>
+                    </div>
                     <a class="vbtn vbtn-square" id="viewerOpen" href="#" target="_blank" rel="noopener" title="Abrir em nova aba" aria-label="Abrir em nova aba">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
                     </a>
@@ -74,10 +91,18 @@
                 </div>
                 <div id="pdfCanvas" class="pdf-canvas" aria-label="Visualizador de PDF"></div>
                 <div class="page-indicator" id="pageIndicator" hidden>
-                    <span id="pageNum">1</span> / <span id="pageTotal">1</span>
+                    <span id="pageNum">1</span> <span class="sep">/</span> <span id="pageTotal">1</span>
                 </div>
                 <div class="pdf-loader" id="pdfLoader" hidden>
-                    <div class="spinner"></div>
+                    <div class="skeleton-page">
+                        <div class="shimmer"></div>
+                    </div>
+                    <div class="loader-text">
+                        <span id="loaderText">Carregando…</span>
+                    </div>
+                </div>
+                <div class="toast" id="toast" hidden>
+                    <span id="toastText"></span>
                 </div>
             </div>
         </main>
