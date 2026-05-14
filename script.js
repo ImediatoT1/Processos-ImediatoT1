@@ -121,10 +121,86 @@ const app          = document.getElementById('app');
 const viewer       = document.getElementById('viewer');
 const viewerTitle  = document.getElementById('viewerTitle');
 const viewerTag    = document.getElementById('viewerTag');
-const frame        = document.getElementById('pdfFrame');
+const pdfCanvas    = document.getElementById('pdfCanvas');
 const loader       = document.getElementById('pdfLoader');
 const viewerOpen   = document.getElementById('viewerOpen');
 const viewerDl     = document.getElementById('viewerDownload');
+
+/* PDF.js setup */
+let pdfReady = false;
+function setupPdfJs() {
+    if (window.pdfjsLib && !pdfReady) {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        pdfReady = true;
+    }
+    return pdfReady;
+}
+
+let renderToken = 0;
+let currentResizeUrl = null;
+
+async function renderPdf(url) {
+    const token = ++renderToken;
+    currentResizeUrl = url;
+
+    pdfCanvas.classList.remove('loaded');
+    pdfCanvas.innerHTML = '';
+    loader.hidden = false;
+    loader.classList.remove('fading');
+
+    if (!setupPdfJs()) {
+        // pdf.js not yet loaded; wait briefly
+        await new Promise(r => setTimeout(r, 200));
+        setupPdfJs();
+    }
+
+    try {
+        const pdf = await window.pdfjsLib.getDocument(url).promise;
+        if (token !== renderToken) return;
+
+        const containerWidth = Math.max(pdfCanvas.clientWidth - 32, 280);
+        const dpr = window.devicePixelRatio || 1;
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+            if (token !== renderToken) return;
+            const page = await pdf.getPage(i);
+            const baseViewport = page.getViewport({ scale: 1 });
+            const scale = containerWidth / baseViewport.width;
+            const viewport = page.getViewport({ scale });
+
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.floor(viewport.width * dpr);
+            canvas.height = Math.floor(viewport.height * dpr);
+            canvas.style.width = Math.floor(viewport.width) + 'px';
+            canvas.style.height = Math.floor(viewport.height) + 'px';
+            pdfCanvas.appendChild(canvas);
+
+            const renderContext = {
+                canvasContext: canvas.getContext('2d'),
+                viewport,
+                transform: dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null,
+            };
+            await page.render(renderContext).promise;
+            if (token !== renderToken) return;
+
+            // Show after first page loads
+            if (i === 1) {
+                pdfCanvas.classList.add('loaded');
+                loader.classList.add('fading');
+                setTimeout(() => { if (token === renderToken) loader.hidden = true; }, 300);
+            }
+        }
+    } catch (err) {
+        if (token === renderToken) {
+            console.error('Erro ao carregar PDF:', err);
+            pdfCanvas.innerHTML = `<div style="color:#94A3B8;text-align:center;padding:40px;font-size:14px">Não foi possível carregar este manual.</div>`;
+            pdfCanvas.classList.add('loaded');
+            loader.classList.add('fading');
+            setTimeout(() => { loader.hidden = true; }, 300);
+        }
+    }
+}
 
 function openPdf(href, name, tag, triggerBtn) {
     viewerTitle.textContent = name;
@@ -134,41 +210,45 @@ function openPdf(href, name, tag, triggerBtn) {
     viewerDl.href = href;
     viewerDl.setAttribute('download', name);
 
-    frame.classList.remove('loaded');
-    loader.hidden = false;
-    loader.classList.remove('fading');
-    frame.src = href + '#toolbar=0&navpanes=0&statusbar=0&view=FitH';
-
     viewer.classList.add('is-active');
+    renderPdf(href);
 
-    // Mark active in sidebar
     document.querySelectorAll('.pdf.is-active').forEach(el => el.classList.remove('is-active'));
     if (triggerBtn) triggerBtn.classList.add('is-active');
 }
 
 function closePdf() {
+    renderToken++;
+    currentResizeUrl = null;
     viewer.classList.remove('is-active');
     setTimeout(() => {
-        frame.src = 'about:blank';
-        frame.classList.remove('loaded');
+        pdfCanvas.innerHTML = '';
+        pdfCanvas.classList.remove('loaded');
     }, 400);
     viewerTitle.textContent = 'Selecione um manual';
     viewerTag.textContent = '—';
     document.querySelectorAll('.pdf.is-active').forEach(el => el.classList.remove('is-active'));
 }
 
-frame.addEventListener('load', () => {
-    if (frame.src && !frame.src.endsWith('about:blank')) {
-        frame.classList.add('loaded');
-        loader.classList.add('fading');
-        setTimeout(() => { loader.hidden = true; }, 300);
-    }
-});
+/* Re-render on significant resize / sidebar toggle */
+let resizeTimer;
+function scheduleRerender() {
+    if (!currentResizeUrl) return;
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        if (currentResizeUrl) renderPdf(currentResizeUrl);
+    }, 300);
+}
+window.addEventListener('resize', scheduleRerender);
 
 /* Sidebar toggle */
 function toggleSidebar(force) {
     const willCollapse = typeof force === 'boolean' ? force : !app.classList.contains('sidebar-collapsed');
     app.classList.toggle('sidebar-collapsed', willCollapse);
+    // Re-render PDF at new width after transition finishes
+    if (currentResizeUrl) {
+        setTimeout(() => renderPdf(currentResizeUrl), 500);
+    }
 }
 
 /* Event delegation */
