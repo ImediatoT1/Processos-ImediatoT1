@@ -1,16 +1,23 @@
 /* Processos T1 — Linktree sidebar + viewer */
 
 :root {
-    --bg: #07090F;
-    --bg-deep: #04060B;
-    --surface: rgba(255,255,255,0.04);
-    --surface-hover: rgba(255,255,255,0.07);
-    --surface-active: rgba(255,255,255,0.10);
-    --border: rgba(255,255,255,0.08);
-    --border-strong: rgba(255,255,255,0.14);
+    /* Navy marinho — matched to brand */
+    --bg: #0A1929;
+    --bg-deep: #06121F;
+    --bg-elevated: #102943;
+    --surface: rgba(255,255,255,0.045);
+    --surface-hover: rgba(255,255,255,0.08);
+    --surface-active: rgba(255,255,255,0.12);
+    --border: rgba(141, 168, 199, 0.12);
+    --border-strong: rgba(141, 168, 199, 0.22);
     --text: #F1F5F9;
-    --text-muted: #94A3B8;
-    --text-dim: #64748B;
+    --text-muted: #8DA8C7;
+    --text-dim: #5B7898;
+
+    /* Brand teal accent (matches logo) */
+    --accent: #2DD4BF;
+    --accent-soft: rgba(45, 212, 191, 0.16);
+    --accent-strong: #14B8A6;
 
     --radius: 12px;
     --radius-lg: 18px;
@@ -148,8 +155,9 @@ img { display: block; max-width: 100%; }
 }
 .search input::placeholder { color: var(--text-dim); }
 .search input:focus {
-    border-color: var(--border-strong);
+    border-color: var(--accent-soft);
     background: var(--surface-hover);
+    box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.10);
 }
 .search input::-webkit-search-cancel-button { display: none; }
 .search-clear {
@@ -289,15 +297,16 @@ img { display: block; max-width: 100%; }
     content: '';
     position: absolute;
     left: 0; top: 8px; bottom: 8px;
-    width: 2px;
-    background: var(--text);
+    width: 3px;
+    background: var(--accent);
     border-radius: 2px;
     animation: barPulse 2.4s ease-in-out infinite;
 }
 @keyframes barPulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,255,255,0); }
-    50%      { opacity: 0.7; box-shadow: 0 0 8px 0 rgba(255,255,255,0.25); }
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(45,212,191,0); }
+    50%      { opacity: 0.85; box-shadow: 0 0 10px 0 rgba(45,212,191,0.4); }
 }
+.pdf.is-active .pdf-bullet { background: var(--accent); }
 .pdf-bullet {
     width: 4px; height: 4px;
     border-radius: 50%;
@@ -700,26 +709,33 @@ img { display: block; max-width: 100%; }
 
 .skeleton-page {
     position: relative;
-    width: min(540px, 75%);
-    aspect-ratio: 1.414 / 1;
+    width: min(720px, 85%);
+    aspect-ratio: 16 / 9;
     background: #ECECEC;
     border-radius: 4px;
     box-shadow: 0 6px 24px rgba(0,0,0,0.5);
     overflow: hidden;
 }
 .skeleton-page::before {
+    /* Mimics a slide layout: title bar + 2-column content blocks */
     content: '';
     position: absolute;
-    inset: 8% 6%;
+    inset: 6% 5%;
     background:
-        linear-gradient(#D5D5D5, #D5D5D5) top left / 35% 4% no-repeat,
-        linear-gradient(#E5E5E5, #E5E5E5) 0 12% / 100% 4% no-repeat,
-        linear-gradient(#E5E5E5, #E5E5E5) 0 20% / 92% 4% no-repeat,
-        linear-gradient(#E5E5E5, #E5E5E5) 0 28% / 96% 4% no-repeat,
-        linear-gradient(#E5E5E5, #E5E5E5) 0 44% / 100% 16% no-repeat,
-        linear-gradient(#E5E5E5, #E5E5E5) 0 66% / 80% 4% no-repeat,
-        linear-gradient(#E5E5E5, #E5E5E5) 0 74% / 95% 4% no-repeat,
-        linear-gradient(#E5E5E5, #E5E5E5) 0 82% / 70% 4% no-repeat;
+        /* "Passo 01" title */
+        linear-gradient(#B6CFE0, #B6CFE0) top left / 22% 6% no-repeat,
+        /* Title underline / divider */
+        linear-gradient(#DDE6EE, #DDE6EE) 0 12% / 60% 5% no-repeat,
+        /* Left content block (image area) */
+        linear-gradient(#D8D8D8, #D8D8D8) 0 24% / 48% 65% no-repeat,
+        /* Right text lines */
+        linear-gradient(#E2E2E2, #E2E2E2) 55% 24% / 45% 4% no-repeat,
+        linear-gradient(#E2E2E2, #E2E2E2) 55% 32% / 42% 4% no-repeat,
+        linear-gradient(#E2E2E2, #E2E2E2) 55% 40% / 45% 4% no-repeat,
+        linear-gradient(#E2E2E2, #E2E2E2) 55% 50% / 38% 4% no-repeat,
+        linear-gradient(#E2E2E2, #E2E2E2) 55% 58% / 44% 4% no-repeat,
+        linear-gradient(#E2E2E2, #E2E2E2) 55% 70% / 40% 4% no-repeat,
+        linear-gradient(#E2E2E2, #E2E2E2) 55% 78% / 35% 4% no-repeat;
 }
 .skeleton-page .shimmer {
     position: absolute;
@@ -744,8 +760,8 @@ img { display: block; max-width: 100%; }
     content: '';
     width: 12px; height: 12px;
     border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.1);
-    border-top-color: rgba(255,255,255,0.5);
+    border: 2px solid rgba(141,168,199,0.15);
+    border-top-color: var(--accent);
     animation: spin 0.9s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -926,7 +942,7 @@ img { display: block; max-width: 100%; }
     position: relative;
     width: 100%;
     max-width: 420px;
-    background: linear-gradient(165deg, #0F1424, #0B0F1C);
+    background: linear-gradient(165deg, #102943, #06121F);
     border: 1px solid var(--border-strong);
     border-radius: 22px;
     padding: 28px 24px 24px;
@@ -965,7 +981,7 @@ img { display: block; max-width: 100%; }
     border-radius: 18px;
     overflow: hidden;
     border: 1px solid var(--border-strong);
-    background: linear-gradient(135deg, #131A2C, #0B0F1C);
+    background: linear-gradient(135deg, #163758, #06121F);
     box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     position: relative;
 }
@@ -984,7 +1000,7 @@ img { display: block; max-width: 100%; }
     font-size: 32px;
     font-weight: 800;
     color: var(--text);
-    background: linear-gradient(135deg, #0F1424, #0B0F1C);
+    background: linear-gradient(135deg, #102943, #06121F);
 }
 
 .install-title,
@@ -1023,11 +1039,11 @@ img { display: block; max-width: 100%; }
                 color 0.2s var(--ease), transform 0.15s var(--ease);
 }
 .btn-primary {
-    background: var(--text);
-    color: #0B0F1C;
-    border-color: var(--text);
+    background: var(--accent);
+    color: #06121F;
+    border-color: var(--accent);
 }
-.btn-primary:hover { background: #fff; }
+.btn-primary:hover { background: var(--accent-strong); border-color: var(--accent-strong); }
 .btn-primary:active { transform: scale(0.97); }
 .btn-secondary {
     background: transparent;
@@ -1093,4 +1109,84 @@ img { display: block; max-width: 100%; }
 @media (max-width: 480px) {
     .install-card, .ios-card { padding: 24px 18px 20px; }
     .install-title, .ios-title { font-size: 17px; }
+}
+
+/* PWA install success animation */
+.install-success {
+    position: fixed;
+    inset: 0;
+    z-index: 250;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s var(--ease);
+}
+.install-success[hidden] { display: none; }
+.install-success.show { opacity: 1; }
+
+.success-card {
+    background: rgba(10, 25, 41, 0.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--border-strong);
+    border-radius: 18px;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(45,212,191,0.18);
+    transform: translateY(20px) scale(0.96);
+    transition: transform 0.45s var(--ease);
+    max-width: 360px;
+}
+.install-success.show .success-card {
+    transform: translateY(0) scale(1);
+}
+
+.success-check {
+    flex-shrink: 0;
+    width: 44px; height: 44px;
+}
+.success-circle {
+    stroke: var(--accent);
+    stroke-width: 3;
+    stroke-dasharray: 160;
+    stroke-dashoffset: 160;
+    transform-origin: center;
+    transform: rotate(-90deg);
+}
+.success-tick {
+    stroke: var(--accent);
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 50;
+    stroke-dashoffset: 50;
+}
+.install-success.show .success-circle {
+    animation: drawCircle 0.55s var(--ease) forwards;
+}
+.install-success.show .success-tick {
+    animation: drawTick 0.35s var(--ease) 0.45s forwards;
+}
+@keyframes drawCircle {
+    to { stroke-dashoffset: 0; }
+}
+@keyframes drawTick {
+    to { stroke-dashoffset: 0; }
+}
+
+.success-text { display: flex; flex-direction: column; gap: 2px; }
+.success-text strong {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text);
+}
+.success-text span {
+    font-size: 12.5px;
+    color: var(--text-muted);
 }

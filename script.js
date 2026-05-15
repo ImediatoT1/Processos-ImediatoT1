@@ -850,13 +850,27 @@ function setupInstallPrompt() {
         deferredPrompt = e;
     });
 
-    // Hide prompt forever after install
+    // Hide prompt forever after install + show success animation
     window.addEventListener('appinstalled', () => {
         deferredPrompt = null;
         localStorage.setItem(LS_KEY, (Date.now() + 365 * DAY_MS).toString());
         closeSheet(sheet);
         closeSheet(iosModal);
+        showInstallSuccess();
     });
+
+    function showInstallSuccess() {
+        const el = document.getElementById('installSuccess');
+        if (!el) return;
+        el.hidden = false;
+        requestAnimationFrame(() => el.classList.add('show'));
+        // Light haptic if supported
+        if (navigator.vibrate) navigator.vibrate([15, 60, 15]);
+        setTimeout(() => {
+            el.classList.remove('show');
+            setTimeout(() => { el.hidden = true; }, 350);
+        }, 2800);
+    }
 
     // Show prompt if criteria met
     function maybeShow() {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
-    <meta name="theme-color" content="#04060B" />
+    <meta name="theme-color" content="#0A1929" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <title>Processos T1</title>
@@ -134,6 +134,20 @@
             <div class="install-actions">
                 <button class="btn-secondary" data-install-close>Agora não</button>
                 <button class="btn-primary" id="installAccept">Instalar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA Install Success -->
+    <div class="install-success" id="installSuccess" hidden aria-hidden="true">
+        <div class="success-card">
+            <svg class="success-check" viewBox="0 0 52 52" aria-hidden="true">
+                <circle class="success-circle" cx="26" cy="26" r="24" fill="none" />
+                <path class="success-tick" fill="none" d="M14 27 l8 8 l16 -16" />
+            </svg>
+            <div class="success-text">
+                <strong>Adicionado à tela inicial</strong>
+                <span>Abra "Processos" pelo ícone do app.</span>
             </div>
         </div>
     </div>
