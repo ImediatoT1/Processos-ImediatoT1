@@ -366,6 +366,7 @@ function attachSlideGestures(container) {
 
     container.addEventListener('touchstart', (e) => {
         if (!container.classList.contains('slide-mode')) return;
+        if (!viewer.classList.contains('is-active')) return;
         if (e.touches.length === 1) {
             activePage = getActivePage();
             if (!activePage) return;
