@@ -11,6 +11,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/avif" href="assets/logo.avif">
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+    <link rel="apple-touch-icon" href="assets/icon-192.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="assets/icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="assets/icon-512.png">
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" defer></script>
 </head>
@@ -110,6 +116,67 @@
         <button class="floating-toggle" id="showSidebarBtn" data-show-sidebar aria-label="Mostrar menu" hidden>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
+    </div>
+
+    <!-- PWA Install Prompt -->
+    <div class="install-sheet" id="installSheet" hidden aria-hidden="true">
+        <div class="install-backdrop" data-install-close></div>
+        <div class="install-card" role="dialog" aria-labelledby="installTitle">
+            <button class="install-close" data-install-close aria-label="Fechar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <div class="install-icon">
+                <img src="assets/icon-192.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+                <span class="install-icon-fallback" aria-hidden="true">P</span>
+            </div>
+            <h3 class="install-title" id="installTitle">Instalar Processos</h3>
+            <p class="install-text">Adicione à tela inicial para acesso rápido aos manuais, sem precisar abrir o navegador.</p>
+            <div class="install-actions">
+                <button class="btn-secondary" data-install-close>Agora não</button>
+                <button class="btn-primary" id="installAccept">Instalar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- iOS Install Instructions -->
+    <div class="ios-instructions" id="iosInstructions" hidden aria-hidden="true">
+        <div class="install-backdrop" data-ios-close></div>
+        <div class="ios-card" role="dialog" aria-labelledby="iosTitle">
+            <button class="install-close" data-ios-close aria-label="Fechar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <h3 class="ios-title" id="iosTitle">Instalar no iPhone</h3>
+            <p class="ios-sub">Siga estes três passos no Safari:</p>
+            <ol class="ios-steps">
+                <li>
+                    <span class="step-num">1</span>
+                    <span class="step-content">
+                        Toque no botão <strong>Compartilhar</strong>
+                        <span class="step-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                        </span>
+                        na barra inferior do Safari.
+                    </span>
+                </li>
+                <li>
+                    <span class="step-num">2</span>
+                    <span class="step-content">
+                        Role para baixo e toque em
+                        <strong>“Adicionar à Tela de Início”</strong>
+                        <span class="step-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        </span>
+                    </span>
+                </li>
+                <li>
+                    <span class="step-num">3</span>
+                    <span class="step-content">
+                        Toque em <strong>Adicionar</strong> no canto superior direito. Pronto!
+                    </span>
+                </li>
+            </ol>
+            <button class="btn-primary ios-ok" data-ios-close>Entendi</button>
+        </div>
     </div>
 
     <script src="script.js"></script>

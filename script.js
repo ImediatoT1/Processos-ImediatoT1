@@ -794,4 +794,118 @@ searchInput.addEventListener('input', () => {
 document.addEventListener('DOMContentLoaded', () => {
     render();
     attachSlideGestures(pdfCanvas);
+    setupInstallPrompt();
 });
+
+/* ============================================
+   PWA install prompt — Android (native) + iOS (instructions)
+   Shows max 1×/day on mobile only; never if already installed
+   ============================================ */
+function setupInstallPrompt() {
+    const sheet     = document.getElementById('installSheet');
+    const iosModal  = document.getElementById('iosInstructions');
+    const acceptBtn = document.getElementById('installAccept');
+    if (!sheet || !iosModal) return;
+
+    const LS_KEY = 'installPromptShownAt';
+    const DAY_MS = 24 * 60 * 60 * 1000;
+
+    function isMobileDevice() {
+        return window.matchMedia('(max-width: 1023px)').matches &&
+               ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    }
+    function isIOS() {
+        const ua = navigator.userAgent;
+        return /iPad|iPhone|iPod/.test(ua) ||
+               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    }
+    function isStandalone() {
+        return window.matchMedia('(display-mode: standalone)').matches ||
+               window.navigator.standalone === true ||
+               document.referrer.startsWith('android-app://');
+    }
+    function shownRecently() {
+        const t = parseInt(localStorage.getItem(LS_KEY), 10);
+        return !isNaN(t) && (Date.now() - t < DAY_MS);
+    }
+    function markShown() {
+        localStorage.setItem(LS_KEY, Date.now().toString());
+    }
+    function openSheet(el) {
+        el.hidden = false;
+        el.setAttribute('aria-hidden', 'false');
+        requestAnimationFrame(() => el.classList.add('open'));
+    }
+    function closeSheet(el) {
+        el.classList.remove('open');
+        el.setAttribute('aria-hidden', 'true');
+        setTimeout(() => { el.hidden = true; }, 300);
+    }
+
+    let deferredPrompt = null;
+
+    // Android: capture native install prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+    });
+
+    // Hide prompt forever after install
+    window.addEventListener('appinstalled', () => {
+        deferredPrompt = null;
+        localStorage.setItem(LS_KEY, (Date.now() + 365 * DAY_MS).toString());
+        closeSheet(sheet);
+        closeSheet(iosModal);
+    });
+
+    // Show prompt if criteria met
+    function maybeShow() {
+        if (isStandalone()) return;
+        if (!isMobileDevice()) return;
+        if (shownRecently()) return;
+        // For iOS, always show our custom prompt (no native install)
+        // For Android, wait briefly for beforeinstallprompt to fire
+        const ios = isIOS();
+        const delay = ios ? 3500 : 4500;
+        setTimeout(() => {
+            if (isStandalone() || shownRecently()) return;
+            if (!ios && !deferredPrompt) return; // Android without prompt event = browser unsupported
+            openSheet(sheet);
+            markShown();
+        }, delay);
+    }
+    maybeShow();
+
+    // Accept button
+    acceptBtn.addEventListener('click', async () => {
+        if (isIOS()) {
+            closeSheet(sheet);
+            setTimeout(() => openSheet(iosModal), 250);
+        } else if (deferredPrompt) {
+            closeSheet(sheet);
+            try {
+                deferredPrompt.prompt();
+                await deferredPrompt.userChoice;
+            } catch (_) {}
+            deferredPrompt = null;
+        } else {
+            // Fallback: show generic instructions
+            closeSheet(sheet);
+            setTimeout(() => openSheet(iosModal), 250);
+        }
+    });
+
+    // Close handlers
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('[data-install-close]')) closeSheet(sheet);
+        if (e.target.closest('[data-ios-close]')) closeSheet(iosModal);
+    });
+
+    // Esc closes
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            if (sheet.classList.contains('open')) closeSheet(sheet);
+            if (iosModal.classList.contains('open')) closeSheet(iosModal);
+        }
+    });
+}

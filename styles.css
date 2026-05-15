@@ -886,3 +886,211 @@ img { display: block; max-width: 100%; }
     outline-offset: 3px;
     border-radius: 6px;
 }
+
+/* ============================================
+   PWA Install Prompts
+   ============================================ */
+.install-sheet,
+.ios-instructions {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s var(--ease), visibility 0s linear 0.3s;
+    padding: 16px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+.install-sheet.open,
+.ios-instructions.open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s var(--ease), visibility 0s;
+}
+.install-sheet[hidden],
+.ios-instructions[hidden] { display: none; }
+
+.install-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(3, 5, 11, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.install-card,
+.ios-card {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    background: linear-gradient(165deg, #0F1424, #0B0F1C);
+    border: 1px solid var(--border-strong);
+    border-radius: 22px;
+    padding: 28px 24px 24px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+    transform: translateY(40px);
+    transition: transform 0.4s var(--ease);
+    text-align: center;
+}
+.install-sheet.open .install-card,
+.ios-instructions.open .ios-card {
+    transform: translateY(0);
+}
+
+.install-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    display: grid; place-items: center;
+    transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+.install-close:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--text);
+}
+.install-close:active { transform: scale(0.92); }
+.install-close svg { width: 14px; height: 14px; }
+
+.install-icon {
+    width: 72px; height: 72px;
+    margin: 0 auto 16px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--border-strong);
+    background: linear-gradient(135deg, #131A2C, #0B0F1C);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    position: relative;
+}
+.install-icon img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.install-icon-fallback {
+    display: none;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--text);
+    background: linear-gradient(135deg, #0F1424, #0B0F1C);
+}
+
+.install-title,
+.ios-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 19px;
+    margin: 0 0 8px;
+    color: var(--text);
+    letter-spacing: -0.01em;
+}
+.install-text,
+.ios-sub {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.55;
+    margin: 0 0 20px;
+}
+
+.install-actions {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 10px;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    transition: background 0.2s var(--ease), border-color 0.2s var(--ease),
+                color 0.2s var(--ease), transform 0.15s var(--ease);
+}
+.btn-primary {
+    background: var(--text);
+    color: #0B0F1C;
+    border-color: var(--text);
+}
+.btn-primary:hover { background: #fff; }
+.btn-primary:active { transform: scale(0.97); }
+.btn-secondary {
+    background: transparent;
+    color: var(--text-muted);
+}
+.btn-secondary:hover {
+    color: var(--text);
+    background: rgba(255,255,255,0.04);
+    border-color: var(--border-strong);
+}
+.btn-secondary:active { transform: scale(0.97); }
+
+/* iOS instructions */
+.ios-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.ios-steps li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+.step-num {
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    font-weight: 700;
+    font-size: 13px;
+    display: grid; place-items: center;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.step-content {
+    flex: 1;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.55;
+}
+.step-content strong { color: var(--text); font-weight: 600; }
+.step-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    margin: 0 3px;
+    vertical-align: middle;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+}
+.step-icon svg { width: 12px; height: 12px; }
+
+.ios-ok { width: 100%; }
+
+@media (max-width: 480px) {
+    .install-card, .ios-card { padding: 24px 18px 20px; }
+    .install-title, .ios-title { font-size: 17px; }
+}
