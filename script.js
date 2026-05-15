@@ -630,10 +630,12 @@ const ZOOM_MAX = 3;
 
 function applyDesktopZoom() {
     if (slideMode) return; // desktop only
+    pdfCanvas.classList.toggle('is-zoomed', desktopZoom > 1.01);
     pdfCanvas.querySelectorAll('canvas').forEach(c => {
         const nw = parseFloat(c.dataset.naturalWidth || c.style.width);
         c.style.width = (nw * desktopZoom) + 'px';
         c.style.height = 'auto';
+        c.style.maxWidth = desktopZoom > 1.01 ? 'none' : '';
     });
 }
 function setDesktopZoom(z) {
