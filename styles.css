@@ -132,6 +132,31 @@ img { display: block; max-width: 100%; }
     letter-spacing: 0.02em;
 }
 
+/* Notice banner */
+.notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(251, 191, 36, 0.08);
+    border: 1px solid rgba(251, 191, 36, 0.28);
+    color: #FCD34D;
+    font-size: 13px;
+    line-height: 1.45;
+}
+.notice-icon {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 18px; height: 18px;
+    margin-top: 1px;
+    color: #FCD34D;
+}
+.notice-icon svg { width: 16px; height: 16px; }
+.notice-text { color: #FDE68A; }
+.notice-text strong { color: #FEF3C7; font-weight: 600; }
+
 /* Search */
 .search { position: relative; }
 .search .search-glass {
