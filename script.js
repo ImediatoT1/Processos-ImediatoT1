@@ -69,10 +69,19 @@ const CATEGORIES = [
             'Cronograma VPO 2026.pdf',
         ],
     },
+    {
+        id: 'scorecard', title: 'Scorecard',
+        folder: '06 - Scorecard',
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 14h6"/><path d="M9 10h6"/><path d="M9 18h6"/></svg>`,
+        items: [
+            'Painel Scorecard v2 - abril.xlsx',
+            'SCORECARD 2026.png',
+        ],
+    },
 ];
 
 
-const cleanName  = f => f.replace(/\.pdf$/i, '').replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
+const cleanName  = f => f.replace(/\.(pdf|png|xlsx|xls|jpg|jpeg|webp)$/i, '').replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
 const encodePath = (folder, file) => `${encodeURIComponent(folder)}/${encodeURIComponent(file)}`;
 const escapeAttr = s => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 const normalize  = s => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -178,6 +187,59 @@ async function renderPdf(url, opts = {}) {
     const token = ++renderToken;
     currentResizeUrl = url;
     const slide = slideMode;
+
+    const decodedUrl = decodeURIComponent(url);
+    const ext = decodedUrl.split('.').pop().toLowerCase();
+    const isImage = ['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(ext);
+    const isExcel = ['xlsx', 'xls'].includes(ext);
+
+    if (isImage) {
+        pdfCanvas.classList.remove('slide-mode');
+        pdfCanvas.innerHTML = `
+            <div class="img-viewer-wrap">
+                <img src="${url}" alt="${escapeAttr(viewerTitle.textContent)}" />
+            </div>
+        `;
+        pdfCanvas.classList.add('loaded');
+        loader.hidden = true;
+        pageIndicator.hidden = true;
+        totalPages = 0;
+        lastRenderedKey = `${url}|img`;
+        return;
+    }
+
+    if (isExcel) {
+        pdfCanvas.classList.remove('slide-mode');
+        pdfCanvas.innerHTML = `
+            <div class="xlsx-viewer-wrap">
+                <div style="font-size:64px;color:#10B981;margin-bottom:8px;display:grid;place-items:center;">
+                    <svg viewBox="0 0 24 24" width="72" height="72" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <path d="M8 13h2v7H8z"/>
+                        <path d="M14 13h2v7h-2z"/>
+                        <path d="M8 17h8"/>
+                    </svg>
+                </div>
+                <h3>Planilha Excel (Scorecard)</h3>
+                <p>Planilhas do Excel não podem ser visualizadas diretamente no navegador. Clique no botão abaixo para baixar e abrir o arquivo.</p>
+                <a href="${url}" download class="btn-primary" style="text-decoration:none;margin-top:10px;display:inline-flex;align-items:center;gap:8px;">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Baixar Planilha
+                </a>
+            </div>
+        `;
+        pdfCanvas.classList.add('loaded');
+        loader.hidden = true;
+        pageIndicator.hidden = true;
+        totalPages = 0;
+        lastRenderedKey = `${url}|excel`;
+        return;
+    }
 
     const slideKey = slide ? 's' : 'd';
     const wKey = Math.round((slide ? pdfCanvas.clientWidth : pdfCanvas.clientWidth) / 20) * 20;
@@ -543,19 +605,29 @@ function openPdf(href, name, tag, triggerBtn) {
 
     const wasActive = viewer.classList.contains('is-active');
 
+    const decodedUrl = decodeURIComponent(href);
+    const ext = decodedUrl.split('.').pop().toLowerCase();
+    const isPdf = ext === 'pdf';
+
     viewerTitle.textContent = name;
     viewerTitle.title = name;
     viewerTag.textContent = tag;
     viewerOpen.href = href;
     viewerDl.href = href;
-    viewerDl.setAttribute('download', name);
+    viewerDl.setAttribute('download', name + '.' + ext);
 
     viewer.classList.add('is-active');
 
+    // Show/hide zoom group based on whether it is a PDF
+    const zoomGroup = document.getElementById('zoomGroup');
+    if (zoomGroup) {
+        zoomGroup.style.display = isPdf ? '' : 'none';
+    }
+
     // Set mode based on current device state before rendering
-    slideMode = manualFullscreen || (isMobile() && isLandscape());
+    slideMode = isPdf && (manualFullscreen || (isMobile() && isLandscape()));
     pdfCanvas.classList.toggle('slide-mode', slideMode);
-    pageIndicator.hidden = false;
+    pageIndicator.hidden = !isPdf;
     pageIndicator.classList.remove('show');
     viewer.classList.toggle('is-fullscreen', manualFullscreen);
 
