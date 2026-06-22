@@ -33,8 +33,6 @@ const CATEGORIES = [
             '05.2 - LENT - Treinamentos executados.pdf',
             '06 - SKAP.pdf',
             '07 - JLL.pdf',
-            '08 - ABS Total.pdf',
-            '09 - TONH.pdf',
             '10 - LTO.pdf',
         ],
     },
@@ -53,7 +51,6 @@ const CATEGORIES = [
         items: [
             '% de DTOs com desvios.pdf',
             'DTO Novatos.pdf',
-            'Estouro de jornada.pdf',
             'Log_On Segurança.pdf',
             'Monitoramento Liderança.pdf',
             'OKR Rollover.pdf',
