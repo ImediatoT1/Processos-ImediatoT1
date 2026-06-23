@@ -60,11 +60,13 @@ const CATEGORIES = [
         ],
     },
     {
-        id: 'auditorias', title: 'Auditorias',
-        folder: '05 - Cronograma de auditorias 2026',
+        id: 'vpo', title: 'VPO',
+        folder: '05 - VPO',
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
         items: [
-            'Cronograma VPO 2026.pdf',
+            '01 - Guia de preenchimento do checklist VPO.png',
+            '02 - Cronograma de auditorias - H1 2026.png',
+            '03 - Cronograma de auditorias - H2 2026.png',
         ],
     },
     {
@@ -72,8 +74,9 @@ const CATEGORIES = [
         folder: '06 - Scorecard',
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 14h6"/><path d="M9 10h6"/><path d="M9 18h6"/></svg>`,
         items: [
-            'Painel Scorecard v2 - maio.xlsx',
-            'SCORECARD 2026.png',
+            '01 - O que é o Scorecard - 2026.png',
+            '02 - Como calcular o LogEP.png',
+            '03 - Painel Scorecard v2 - maio.xlsx',
         ],
     },
     {
