@@ -51,6 +51,7 @@ const CATEGORIES = [
         items: [
             '% de DTOs com desvios.pdf',
             'DTO Novatos.pdf',
+            'Estouro 12h.pdf',
             'Log_On Segurança.pdf',
             'Monitoramento Liderança.pdf',
             'OKR Rollover.pdf',
