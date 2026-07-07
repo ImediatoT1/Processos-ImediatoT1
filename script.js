@@ -33,6 +33,8 @@ const CATEGORIES = [
             '05.2 - LENT - Treinamentos executados.pdf',
             '06 - SKAP.pdf',
             '07 - JLL.pdf',
+            '08 - ABS Operacional Logístico.pdf',
+            '09 - TONH.pdf',
             '10 - LTO.pdf',
         ],
     },
@@ -42,6 +44,7 @@ const CATEGORIES = [
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 4 5-6"/></svg>`,
         items: [
             'Disponibilidade de gente.pdf',
+            'TTO e LTO.pdf',
         ],
     },
     {
