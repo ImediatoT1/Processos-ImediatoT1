@@ -80,7 +80,7 @@ const CATEGORIES = [
         items: [
             '01 - O que é o Scorecard - 2026.png',
             '02 - Como calcular o LogEP.png',
-            '03 - Painel Scorecard v2 - maio.xlsx',
+            'Painel Scorecard v2 - junho.xlsx',
         ],
     },
     {
