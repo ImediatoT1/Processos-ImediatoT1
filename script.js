@@ -71,6 +71,10 @@ const CATEGORIES = [
             '01 - Guia de preenchimento do checklist VPO.png',
             '02 - Cronograma de auditorias - H1 2026.png',
             '03 - Cronograma de auditorias - H2 2026.png',
+            'WS VPO H2_Pilar Gente.pdf',
+            'WS VPO H2_Pilar Gestão.pdf',
+            'WS VPO H2_Pilar Manutenção.pdf',
+            'WS VPO H2_Pilar Segurança.pdf',
         ],
     },
     {
