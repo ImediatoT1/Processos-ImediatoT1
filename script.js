@@ -2,49 +2,11 @@
 
 const CATEGORIES = [
     {
-        id: 'frota', title: 'Frota',
-        folder: '03 - Manual de indicadores - Frota',
-        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6H3v12h11z"/><path d="M14 8h4l3 3v7h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>`,
+        id: 'dmpeople', title: 'DM People',
+        folder: '01 - Manuais DM People',
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
         items: [
-            '01 - Aderência Preventiva.pdf',
-            '02 - Aderência Check de conformidade.pdf',
-            '03 - Milimetragem de Pneu.pdf',
-            '04 - Aderência Checklist - Armazém.pdf',
-            '04 - Aderência Checklist - Empurrada.pdf',
-            '05 - Ordens de Serviço Vencida.pdf',
-            '06 - Stress test - Armazém.pdf',
-            '06 - Stress test - Frota.pdf',
-            '07 - Disponibilidade de empilhadeira.pdf',
-            '07 - Indisponibilidade Manutenção.pdf',
-            '08 - MTBF E MTTR.pdf',
-        ],
-    },
-    {
-        id: 'gente', title: 'Gente',
-        folder: '01 - Manual de indicadores - Gente',
-        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
-        items: [
-            '01 - Banco de candidatos.pdf',
-            '02 - GAP de contratação.pdf',
-            '03 - Log_On Geral.pdf',
-            '03 .1 - Log_On nominal.pdf',
-            '04 - Acompanhamento de novos.pdf',
-            '05.1 - LENT - Treinamentos cadastrados.pdf',
-            '05.2 - LENT - Treinamentos executados.pdf',
-            '06 - SKAP.pdf',
-            '07 - JLL.pdf',
-            '08 - ABS Operacional Logístico.pdf',
-            '09 - TONH.pdf',
-            '10 - LTO.pdf',
-        ],
-    },
-    {
-        id: 'gestao', title: 'Gestão',
-        folder: '04 - Manual de indicadores - Gestão',
-        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 4 5-6"/></svg>`,
-        items: [
-            'Disponibilidade de gente.pdf',
-            'TTO e LTO.pdf',
+            'Manual DMPeople.pdf',
         ],
     },
     {
@@ -64,8 +26,54 @@ const CATEGORIES = [
         ],
     },
     {
+        id: 'gente', title: 'Gente',
+        folder: '03 - Manual de indicadores - Gente',
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+        items: [
+            '01 - Banco de candidatos.pdf',
+            '02 - GAP de contratação.pdf',
+            '03 - Log_On Geral.pdf',
+            '03 .1 - Log_On nominal.pdf',
+            '04 - Acompanhamento de novos.pdf',
+            '05.1 - LENT - Treinamentos cadastrados.pdf',
+            '05.2 - LENT - Treinamentos executados.pdf',
+            '06 - SKAP.pdf',
+            '07 - JLL.pdf',
+            '08 - ABS Operacional Logístico.pdf',
+            '09 - TONH.pdf',
+            '10 - LTO.pdf',
+        ],
+    },
+    {
+        id: 'frota', title: 'Frota',
+        folder: '04 - Manual de indicadores - Frota',
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6H3v12h11z"/><path d="M14 8h4l3 3v7h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>`,
+        items: [
+            '01 - Aderência Preventiva.pdf',
+            '02 - Aderência Check de Conformidade.pdf',
+            '03 - Milimetragem de Pneu.pdf',
+            '04 - Aderência Checklist - Armazém.pdf',
+            '04 - Aderência Checklist - Empurrada.pdf',
+            '05 - Ordens de Serviço Vencida.pdf',
+            '06 - Stress test - Armazém.pdf',
+            '06 - Stress test - Frota.pdf',
+            '07 - Disponibilidade de empilhadeira.pdf',
+            '07 - Indisponibilidade Manutenção.pdf',
+            '08 - MTBF E MTTR.pdf',
+        ],
+    },
+    {
+        id: 'gestao', title: 'Gestão',
+        folder: '05 - Manual de indicadores - Gestão',
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 4 5-6"/></svg>`,
+        items: [
+            'Disponibilidade de gente.pdf',
+            'TTO e LTO.pdf',
+        ],
+    },
+    {
         id: 'vpo', title: 'VPO',
-        folder: '05 - VPO',
+        folder: '06 - VPO',
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
         items: [
             '01 - Guia de preenchimento do checklist VPO.png',
@@ -79,7 +87,7 @@ const CATEGORIES = [
     },
     {
         id: 'scorecard', title: 'Scorecard',
-        folder: '06 - Scorecard',
+        folder: '07 - Scorecard',
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 14h6"/><path d="M9 10h6"/><path d="M9 18h6"/></svg>`,
         items: [
             '01 - O que é o Scorecard - 2026.png',
@@ -89,7 +97,7 @@ const CATEGORIES = [
     },
     {
         id: 'politica', title: 'Política e Conduta',
-        folder: '07 - Política Global e Código de Conduta e Ética',
+        folder: '08 - Política Global e Código de Conduta e Ética',
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20M4 19.5V3a1 1 0 0 1 1-1h15v20H5a1 1 0 0 1-1-1z"/></svg>`,
         items: [
             'Cartilha Código de Conduta - IMEDIATO.pdf',
