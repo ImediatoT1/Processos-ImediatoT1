@@ -51,6 +51,7 @@ const CATEGORIES = [
         items: [
             '01 - Aderência Preventiva.pdf',
             '02 - Aderência Check de Conformidade.pdf',
+            '02 - Aderência Check de Conformidade - Nova atualização.pdf',
             '03 - Milimetragem de Pneu.pdf',
             '04 - Aderência Checklist - Armazém.pdf',
             '04 - Aderência Checklist - Empurrada.pdf',
