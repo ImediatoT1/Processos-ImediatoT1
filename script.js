@@ -50,7 +50,6 @@ const CATEGORIES = [
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6H3v12h11z"/><path d="M14 8h4l3 3v7h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>`,
         items: [
             '01 - Aderência Preventiva.pdf',
-            '02 - Aderência Check de Conformidade.pdf',
             '02 - Aderência Check de Conformidade - Nova atualização.pdf',
             '03 - Milimetragem de Pneu.pdf',
             '04 - Aderência Checklist - Armazém.pdf',
