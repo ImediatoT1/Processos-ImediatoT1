@@ -6,6 +6,8 @@ const CATEGORIES = [
         folder: '01 - Manuais DM People',
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
         items: [
+            'Como cadastrar hierarquia no DM People.pdf',
+            'Como verificar as hierarquias cadastradas no DM People.pdf',
             'Manual DMPeople.pdf',
         ],
     },
@@ -102,6 +104,14 @@ const CATEGORIES = [
         items: [
             'Cartilha Código de Conduta - IMEDIATO.pdf',
             'Política Global de Saúde e Segurança - AMBEV.pdf',
+        ],
+    },
+    {
+        id: 'qualidade', title: 'Ferramentas da Qualidade',
+        folder: '09 - Manuais - Ferramentas da Qualidade',
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>`,
+        items: [
+            'Metodologia 5 Porquês.pdf',
         ],
     },
 ];
