@@ -2,6 +2,7 @@
 
 const CATEGORIES = [
     {
+        section: 'Sistemas',
         id: 'dmpeople', title: 'DM People',
         folder: '01 - Manuais DM People',
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
@@ -12,24 +13,9 @@ const CATEGORIES = [
         ],
     },
     {
-        id: 'seguranca', title: 'Segurança',
-        folder: '02 - Manual de indicadores - Segurança',
-        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>`,
-        items: [
-            '% de DTOs com desvios.pdf',
-            'DTO Novatos.pdf',
-            'Estouro 12h.pdf',
-            'Log_On Segurança.pdf',
-            'Monitoramento Liderança.pdf',
-            'OKR Rollover.pdf',
-            'Pessoa por faixa.pdf',
-            'Relatos Guardian..pdf',
-            'Índice telemetria empilhadeira.pdf',
-        ],
-    },
-    {
-        id: 'gente', title: 'Gente',
-        folder: '03 - Manual de indicadores - Gente',
+        section: 'Termômetros T1',
+        id: 't1-gente', title: 'Gente',
+        folder: '02 - Termômetros T1 - Manuais e Passo a passos/01 - Manual de indicadores - Gente',
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
         items: [
             '01 - Banco de candidatos.pdf',
@@ -37,7 +23,7 @@ const CATEGORIES = [
             '03 - Log_On Geral.pdf',
             '03 .1 - Log_On nominal.pdf',
             '04 - Acompanhamento de novos.pdf',
-            '05.1 - LENT - Treinamentos cadastrados.pdf',
+            '05.1 - Lent Treinamentos cadastrados.pdf',
             '05.2 - LENT - Treinamentos executados.pdf',
             '06 - SKAP.pdf',
             '07 - JLL.pdf',
@@ -47,12 +33,29 @@ const CATEGORIES = [
         ],
     },
     {
-        id: 'frota', title: 'Frota',
-        folder: '04 - Manual de indicadores - Frota',
+        section: 'Termômetros T1',
+        id: 't1-seguranca', title: 'Segurança',
+        folder: '02 - Termômetros T1 - Manuais e Passo a passos/02 - Manual de indicadores - Segurança',
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>`,
+        items: [
+            '01 - Índice telemetria empilhadeira.pdf',
+            '02 - Pessoa por faixa.pdf',
+            '03 - Estouro 12h.pdf',
+            '04 - Monitoramento Liderança.pdf',
+            '05 - DTO com desvio.pdf',
+            '06 - Log On Segurança.pdf',
+            '07 - Relatos Guardian.pdf',
+            '08 - OKR Rollover.pdf',
+        ],
+    },
+    {
+        section: 'Termômetros T1',
+        id: 't1-frota', title: 'Frota',
+        folder: '02 - Termômetros T1 - Manuais e Passo a passos/03 - Manual de indicadores - Frota',
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6H3v12h11z"/><path d="M14 8h4l3 3v7h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>`,
         items: [
             '01 - Aderência Preventiva.pdf',
-            '02 - Aderência Check de Conformidade - Nova atualização.pdf',
+            '02 - Aderência Check de conformidade - Novo.pdf',
             '03 - Milimetragem de Pneu.pdf',
             '04 - Aderência Checklist - Armazém.pdf',
             '04 - Aderência Checklist - Empurrada.pdf',
@@ -65,31 +68,44 @@ const CATEGORIES = [
         ],
     },
     {
-        id: 'gestao', title: 'Gestão',
-        folder: '05 - Manual de indicadores - Gestão',
+        section: 'Termômetros T1',
+        id: 't1-gestao', title: 'Gestão',
+        folder: '02 - Termômetros T1 - Manuais e Passo a passos/04 - Manual de indicadores - Gestão',
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 4 5-6"/></svg>`,
         items: [
             'Disponibilidade de gente.pdf',
-            'TTO e LTO.pdf',
+            'TTO.pdf',
         ],
     },
     {
+        section: 'Termômetros T2',
+        id: 't2-frota', title: 'Frota T2',
+        folder: '03 - Termômetros T2 - Manuais e Passo a passos/01 - Termômetro de Frota',
+        icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6H3v12h11z"/><path d="M14 8h4l3 3v7h-7"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>`,
+        items: [
+            'Passo a passo - Indicadores Frota T2.pdf',
+        ],
+    },
+    {
+        section: 'Diretrizes e Rotinas',
         id: 'vpo', title: 'VPO',
-        folder: '06 - VPO',
+        folder: '04 - VPO',
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
         items: [
             '01 - Guia de preenchimento do checklist VPO.png',
             '02 - Cronograma de auditorias - H1 2026.png',
             '03 - Cronograma de auditorias - H2 2026.png',
-            'WS VPO H2_Pilar Gente.pdf',
-            'WS VPO H2_Pilar Gestão.pdf',
-            'WS VPO H2_Pilar Manutenção.pdf',
-            'WS VPO H2_Pilar Segurança.pdf',
+            { file: '03 - Rampa VPO/rampa-vpo-2026.html', name: 'Rampa VPO 2026' },
+            { file: '04 - Materiais Workshop VPO 2026/WS VPO H2_Pilar Gente.pdf', name: 'Workshop VPO - Pilar Gente' },
+            { file: '04 - Materiais Workshop VPO 2026/WS VPO H2_Pilar Gestão.pdf', name: 'Workshop VPO - Pilar Gestão' },
+            { file: '04 - Materiais Workshop VPO 2026/WS VPO H2_Pilar Manutenção.pdf', name: 'Workshop VPO - Pilar Manutenção' },
+            { file: '04 - Materiais Workshop VPO 2026/WS VPO H2_Pilar Segurança.pdf', name: 'Workshop VPO - Pilar Segurança' },
         ],
     },
     {
+        section: 'Diretrizes e Rotinas',
         id: 'scorecard', title: 'Scorecard',
-        folder: '07 - Scorecard',
+        folder: '05 - Scorecard',
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 14h6"/><path d="M9 10h6"/><path d="M9 18h6"/></svg>`,
         items: [
             '01 - O que é o Scorecard - 2026.png',
@@ -98,8 +114,9 @@ const CATEGORIES = [
         ],
     },
     {
+        section: 'Diretrizes e Rotinas',
         id: 'politica', title: 'Política e Conduta',
-        folder: '08 - Política Global e Código de Conduta e Ética',
+        folder: '06 - Política Global e Código de Conduta e Ética',
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20M4 19.5V3a1 1 0 0 1 1-1h15v20H5a1 1 0 0 1-1-1z"/></svg>`,
         items: [
             'Cartilha Código de Conduta - IMEDIATO.pdf',
@@ -107,8 +124,9 @@ const CATEGORIES = [
         ],
     },
     {
+        section: 'Diretrizes e Rotinas',
         id: 'qualidade', title: 'Ferramentas da Qualidade',
-        folder: '09 - Manuais - Ferramentas da Qualidade',
+        folder: '07 - Manuais - Ferramentas da Qualidade',
         icon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>`,
         items: [
             'Metodologia 5 Porquês.pdf',
@@ -117,39 +135,69 @@ const CATEGORIES = [
 ];
 
 
-const cleanName  = f => f.replace(/\.(pdf|png|xlsx|xls|jpg|jpeg|webp)$/i, '').replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
-const encodePath = (folder, file) => `${encodeURIComponent(folder)}/${encodeURIComponent(file)}`;
-const escapeAttr = s => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-const normalize  = s => (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const cleanName  = f => f.split('/').pop().replace(/\.(pdf|png|xlsx|xls|jpg|jpeg|webp|html|htm)$/i, '').replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
+const encodePath = (folder, file) => {
+    const full = folder ? `${folder}/${file}` : file;
+    return full.split('/').map(seg => encodeURIComponent(seg)).join('/');
+};
+const escapeAttr = s => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+const normalize  = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
 const ICON_CHEV  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>`;
 const ICON_ARROW = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`;
 
 function render() {
     const root = document.getElementById('links');
-    root.innerHTML = CATEGORIES.map(cat => {
+    let lastSection = null;
+    let html = '';
+
+    CATEGORIES.forEach(cat => {
+        if (cat.section && cat.section !== lastSection) {
+            lastSection = cat.section;
+            html += `<div class="sidebar-section-title">${escapeAttr(cat.section)}</div>`;
+        }
+
         const empty = cat.items.length === 0;
+        const countText = empty
+            ? 'Em breve'
+            : cat.items.length === 1
+                ? '1 manual'
+                : `${cat.items.length} manuais`;
+
         const itemsHtml = empty
             ? `<div class="coming-soon-msg">Em breve…</div>`
-            : cat.items.map((file, i) => {
-                const name = cleanName(file);
+            : cat.items.map((item, i) => {
+                const file = typeof item === 'string' ? item : item.file;
+                const name = (typeof item === 'object' && item.name) ? item.name : cleanName(file);
                 const href = encodePath(cat.folder, file);
+                const isHtml = file.toLowerCase().endsWith('.html') || file.toLowerCase().endsWith('.htm');
+
+                if (isHtml) {
+                    return `
+                        <a class="pdf pdf-link" href="${escapeAttr(href)}" target="_blank" rel="noopener" data-name="${escapeAttr(name)}" data-tag="${escapeAttr(cat.title)}" style="animation-delay:${0.03 + 0.025 * i}s">
+                            <span class="pdf-bullet"></span>
+                            <span class="pdf-name">${escapeAttr(name)}</span>
+                            <span class="pdf-arrow">${ICON_ARROW}</span>
+                        </a>
+                    `;
+                }
+
                 return `
-                    <button class="pdf" data-pdf="${escapeAttr(href)}" data-name="${escapeAttr(name)}" data-tag="${cat.title}" style="animation-delay:${0.03 + 0.025 * i}s">
+                    <button class="pdf" data-pdf="${escapeAttr(href)}" data-name="${escapeAttr(name)}" data-tag="${escapeAttr(cat.title)}" style="animation-delay:${0.03 + 0.025 * i}s">
                         <span class="pdf-bullet"></span>
-                        <span class="pdf-name">${name}</span>
+                        <span class="pdf-name">${escapeAttr(name)}</span>
                         <span class="pdf-arrow">${ICON_ARROW}</span>
                     </button>
                 `;
             }).join('');
 
-        return `
+        html += `
             <div class="cat" data-cat="${cat.id}">
                 <button class="cat-btn" aria-expanded="false">
                     <span class="cat-icon">${cat.icon}</span>
                     <span class="cat-text">
-                        <span class="cat-title">${cat.title}</span>
-                        <span class="cat-count">${empty ? 'Em breve' : cat.items.length + ' manuais'}</span>
+                        <span class="cat-title">${escapeAttr(cat.title)}</span>
+                        <span class="cat-count">${countText}</span>
                     </span>
                     <span class="cat-chev">${ICON_CHEV}</span>
                 </button>
@@ -158,7 +206,9 @@ function render() {
                 </div>
             </div>
         `;
-    }).join('');
+    });
+
+    root.innerHTML = html;
 }
 
 let openCat = null;
@@ -835,6 +885,7 @@ document.addEventListener('click', (e) => {
 
     const pdfBtn = e.target.closest('.pdf');
     if (pdfBtn) {
+        if (pdfBtn.tagName === 'A') return; // Abre link HTML nativamente, sem usar o visualizador
         e.preventDefault();
         return openPdf(pdfBtn.dataset.pdf, pdfBtn.dataset.name, pdfBtn.dataset.tag, pdfBtn);
     }
@@ -906,6 +957,19 @@ searchInput.addEventListener('input', () => {
             catEl.classList.remove('open');
             catEl.querySelector('.cat-btn').setAttribute('aria-expanded', 'false');
         }
+    });
+
+    document.querySelectorAll('.sidebar-section-title').forEach(titleEl => {
+        let el = titleEl.nextElementSibling;
+        let hasVisibleCat = false;
+        while (el && !el.classList.contains('sidebar-section-title')) {
+            if (el.classList.contains('cat') && !el.classList.contains('filter-hidden')) {
+                hasVisibleCat = true;
+                break;
+            }
+            el = el.nextElementSibling;
+        }
+        titleEl.classList.toggle('filter-hidden', !hasVisibleCat);
     });
 
     emptyState.hidden = anyCat;
